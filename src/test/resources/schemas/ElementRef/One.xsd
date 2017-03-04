@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="urn:test"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:tns="urn:test"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+  <xsd:include schemaLocation="schema.xsd"/>
+
+  <xsd:element name="OneExtension" type="tns:OneExtension" substitutionGroup="tns:Extension"/>
+
+  <xsd:complexType name="OneExtension">
+    <xsd:complexContent>
+      <xsd:extension base="tns:Extension"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+</xsd:schema>

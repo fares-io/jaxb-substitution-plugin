@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="urn:test"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:tns="urn:test"
+            xmlns:substitution="http://jaxb2-commons.dev.java.net/basic/substitution"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
+            jaxb:version="2.1"
+            jaxb:extensionBindingPrefixes="substitution">
+
+  <xsd:element name="Context" type="tns:Context"/>
+
+  <xsd:complexType name="Context">
+    <xsd:sequence>
+      <xsd:element name="Extension" type="tns:Extension" minOccurs="0" maxOccurs="10">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <substitution:head-ref/>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="Extension" type="tns:Extension"/>
+
+  <xsd:complexType name="Extension">
+    <xsd:attribute name="type" type="xsd:string" use="required"/>
+  </xsd:complexType>
+
+</xsd:schema>
