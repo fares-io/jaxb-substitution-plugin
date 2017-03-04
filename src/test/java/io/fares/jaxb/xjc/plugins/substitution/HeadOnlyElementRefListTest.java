@@ -5,11 +5,14 @@ import io.fares.jaxb.xjc.plugins.substitution.validators.TestValidator;
 
 import java.io.File;
 
-public class NoRefElementListTest extends AbstractSubstitutionPluginTest {
+public class HeadOnlyElementRefListTest extends AbstractSubstitutionPluginTest {
+
+
+  private boolean found = false;
 
   @Override
   public File getSchemaDirectory() {
-    return new File(getBaseDir(), "src/test/resources/schemas/NoRefElementList");
+    return new File(getBaseDir(), "src/test/resources/schemas/HeadOnlyElementRefList");
   }
 
   @Override

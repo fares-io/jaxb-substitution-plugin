@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.namespace.QName;
 
+import com.sun.codemodel.JPackage;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -72,15 +73,46 @@ public class SubstitutionPlugin extends Plugin {
 
   private void postProcessClassInfo(final Model model, final CClassInfo classInfo) {
 
+    classInfo.accept(new CClassInfoParent.Visitor<Void>() {
+
+      @Override
+      public Void onBean(CClassInfo bean) {
+        return null;
+      }
+
+      @Override
+      public Void onPackage(JPackage pkg) {
+        return null;
+      }
+
+      @Override
+      public Void onElement(CElementInfo element) {
+        return null;
+      }
+
+    });
+
+
     for (CPropertyInfo property : classInfo.getProperties()) {
 
       property.accept(new CPropertyVisitor<Void>() {
 
-        public Void onElement(CElementPropertyInfo property) {
+        public Void onElement(CElementPropertyInfo element) {
+
+          boolean isCandidate = Customisation.hasCustomizationsInProperty(element, SUBSTITUTION_HEAD_REF_NAME);
+
+          for (CTypeInfo ref : element.ref()) {
+            isCandidate = isCandidate || Customisation.hasCustomizationsInType(ref, SUBSTITUTION_HEAD_NAME);
+          }
+
+          if (isCandidate) {
+            element.getAdapter();
+          }
+
           return null;
         }
 
-        public Void onAttribute(CAttributePropertyInfo property) {
+        public Void onAttribute(CAttributePropertyInfo attribute) {
           return null;
         }
 
@@ -98,7 +130,7 @@ public class SubstitutionPlugin extends Plugin {
 
           // REVIEW should check if there is only 1 reference
           for (CElement element : property.getElements()) {
-            hasTargetElementCustomizations = hasTargetElementCustomizations || Customisation.hasCustomizationsInElement(element, SUBSTITUTION_HEAD_NAME);
+            hasTargetElementCustomizations = hasTargetElementCustomizations || Customisation.hasCustomizationsInType(element, SUBSTITUTION_HEAD_NAME);
           }
 
           if (hasPropertyCustomizations || hasTargetElementCustomizations) {
@@ -110,7 +142,9 @@ public class SubstitutionPlugin extends Plugin {
               final CElementPropertyInfo elementPropertyInfo;
 
               if (element instanceof CElementInfo) {
-                elementPropertyInfo = createElementPropertyInfo(property, (CElementInfo) element);
+                // FIXME need to translate the element type reference head customizations into head-ref ones
+                CCustomizations customizations = hasPropertyCustomizations ? property.getCustomizations() : element.getCustomizations();
+                elementPropertyInfo = createElementPropertyInfo(property, (CElementInfo) element, customizations);
               } else if (element instanceof CClassInfo) {
                 elementPropertyInfo = null;
               } else if (element instanceof CClassRef) {
@@ -141,7 +175,8 @@ public class SubstitutionPlugin extends Plugin {
   }
 
   private CElementPropertyInfo createElementPropertyInfo(final CReferencePropertyInfo property,
-                                                         final CElementInfo elementInfo) {
+                                                         final CElementInfo elementInfo,
+                                                         final CCustomizations customizations) {
 
     final CElementPropertyInfo elementPropertyInfo = new CElementPropertyInfo(
       property.getName(false),
@@ -149,7 +184,7 @@ public class SubstitutionPlugin extends Plugin {
       property.id(),
       property.getExpectedMimeType(),
       property.getSchemaComponent(),
-      elementInfo.getCustomizations(),
+      customizations,
       property.getLocator(),
       property.isRequired());
 
@@ -187,36 +222,48 @@ public class SubstitutionPlugin extends Plugin {
         CPropertyInfo propertyInfo = fieldOutline.getPropertyInfo();
 
         // check field property customization
+        boolean hasHeadRef = Customisation.hasCustomizationsInProperty(propertyInfo, SUBSTITUTION_HEAD_REF_NAME);
+        // FIXME should not need to do this here but customization gets mixed up when we replace the Ref with
+        //       Element field in the model transformation.
+        hasHeadRef = Customisation.hasCustomizationsInProperty(propertyInfo, SUBSTITUTION_HEAD_NAME) || hasHeadRef;
 
-        if (Customisation.hasCustomizationsInProperty(propertyInfo, SUBSTITUTION_HEAD_REF_NAME) ||
-          Customisation.hasCustomizationsInProperty(propertyInfo, SUBSTITUTION_HEAD_NAME)) {
+        // check if the referenced type is the subsctitution head
+        // FIXME currently only able to add the customization on the complexType and not the element
+        boolean hasHead = false;
 
-          try {
-            Object rawFieldVar = FieldUtils.readField(fieldOutline, "field", true);
-            if (rawFieldVar instanceof JFieldVar) {
-              JFieldVar jFieldVar = (JFieldVar) rawFieldVar;
+        for (CTypeInfo typeInfo : propertyInfo.ref()) {
+          hasHead = hasHead || Customisation.hasCustomizationsInType(typeInfo, SUBSTITUTION_HEAD_NAME);
+        }
+
+        if (hasHeadRef || hasHead) {
+
+          // can be changed to containsKey and getKey
+          for (JFieldVar field : classOutline.ref.fields().values()) {
+
+            if (propertyInfo.getName(false).equals(field.name())) {
+
+              JFieldVar jFieldVar = classOutline.ref.fields().get(propertyInfo.getName(false));
+
               for (JAnnotationUse annotation : jFieldVar.annotations()) {
                 JClass acl = annotation.getAnnotationClass();
                 if (XmlElement.class.getName().equals(acl.fullName())) {
-                  // swap XmlElement for XmlElementRef
-                  FieldUtils.writeField(annotation, "clazz", outline.getCodeModel().ref(XmlElementRef.class), true);
-                  // TODO inspect params to make sure we don't transfer [nillable|defaultValue]
+                  try {
+                    // swap XmlElement for XmlElementRef
+                    FieldUtils.writeField(annotation, "clazz", outline.getCodeModel().ref(XmlElementRef.class), true);
+                    // TODO inspect params to make sure we don't transfer [nillable|defaultValue]
+                  } catch (IllegalAccessException e) {
+                    errorHandler.error(new SAXParseException("The substitution plugin is prevented from modifying an inaccessible field in the XJC model (generation time only). Please ensure your security manager is configured correctly.", propertyInfo.getLocator(), e));
+                    return false;
+                  } catch (IllegalArgumentException e) {
+                    errorHandler.error(new SAXParseException("The substitution plugin encountered an internal error extracting the generated field details.", propertyInfo.getLocator(), e));
+                    return false;
+                  }
                 }
               }
-            } else {
-              errorHandler.error(new SAXParseException("The substitution plugin is unable to process substitution field.", propertyInfo.getLocator()));
-              return false;
             }
-          } catch (IllegalAccessException e) {
-            errorHandler.error(new SAXParseException("The substitution plugin is prevented from modifying an inaccessible field in the XJC model (generation time only). Please ensure your security manager is configured correctly.", propertyInfo.getLocator(), e));
-            return false;
-          } catch (IllegalArgumentException e) {
-            errorHandler.error(new SAXParseException("The substitution plugin encountered an internal error extracting the generated field details.", propertyInfo.getLocator(), e));
-            return false;
           }
         }
       }
-
     }
 
     return true;

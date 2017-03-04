@@ -1,9 +1,6 @@
 package io.fares.jaxb.xjc.plugins.substitution;
 
-import com.sun.tools.xjc.model.CClassInfo;
-import com.sun.tools.xjc.model.CElement;
-import com.sun.tools.xjc.model.CPluginCustomization;
-import com.sun.tools.xjc.model.CPropertyInfo;
+import com.sun.tools.xjc.model.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,11 +31,11 @@ public class Customisation {
     return !findCustomizationsInProperty(propertyInfo, name).isEmpty();
   }
 
-  public static List<CPluginCustomization> findCustomizationsInElement(CElement element, QName name) {
+  public static List<CPluginCustomization> findCustomizationsInType(CTypeInfo type, QName name) {
 
     final List<CPluginCustomization> foundCustomizations = new LinkedList<CPluginCustomization>();
 
-    for (CPluginCustomization customization : element.getCustomizations()) {
+    for (CPluginCustomization customization : type.getCustomizations()) {
       if (fixNull(customization.element.getNamespaceURI()).equals(name.getNamespaceURI())
         && fixNull(customization.element.getLocalName()).equals(name.getLocalPart())) {
         customization.markAsAcknowledged();
@@ -50,8 +47,8 @@ public class Customisation {
 
   }
 
-  public static boolean hasCustomizationsInElement(CElement element, QName name) {
-    return !findCustomizationsInElement(element, name).isEmpty();
+  public static boolean hasCustomizationsInType(CTypeInfo type, QName name) {
+    return !findCustomizationsInType(type, name).isEmpty();
   }
 
 
@@ -62,4 +59,5 @@ public class Customisation {
       return s;
     }
   }
+
 }
