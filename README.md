@@ -73,8 +73,8 @@ JAXB Output:
 
 ```xml
 <t:Context xmlns:t="urn:test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <t:Extension type="some" xsi:type="t:SomeExtension"/>    
-  <t:Extension type="one" xsi:type="t:OneExtension"/>
+  <t:Extension xsi:type="t:SomeExtension"/>    
+  <t:Extension xsi:type="t:OneExtension"/>
 </t:Context>
 ```
 
@@ -82,7 +82,7 @@ JAXB Output:
 
 The ideal modelling state would be to just reference a substitution head element (substitution group heads dont work at the type level anyhow).
 
-1. ensure the `JAxbElement` wrapper is removed
+1. ensure the `JaxbElement` wrapper is not generated
 2. ensure any `@XmlElement` annotations at field or accessor level are replaced with `@XmlElementRef`
 
 Schema: 
@@ -110,8 +110,8 @@ JAXB Output:
 
 ```xml
 <t:Context xmlns:t="urn:test">
-  <t:SomeExtension type="some"/>    
-  <t:OneExtension type="one"/>
+  <t:SomeExtension />    
+  <t:OneExtension />
 </t:Context>
 ```
 
