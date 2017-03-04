@@ -5,17 +5,19 @@ import io.fares.jaxb.xjc.plugins.substitution.validators.WrappedExtensionListVal
 
 import java.io.File;
 
-public class NestedElementRefListTest extends AbstractSubstitutionPluginTest {
+public class NestedHeadOnlyElementRefListTest extends AbstractSubstitutionPluginTest {
+
+
+  private boolean found = false;
 
   @Override
   public File getSchemaDirectory() {
-    return new File(getBaseDir(), "src/test/resources/schemas/NestedElementRefList");
+    return new File(getBaseDir(), "src/test/resources/schemas/NestedHeadOnlyElementRefList");
   }
 
   @Override
   protected TestValidator getValidator() {
     return new WrappedExtensionListValidator();
   }
-
 
 }

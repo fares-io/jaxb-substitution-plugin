@@ -2,6 +2,7 @@ package io.fares.jaxb.xjc.plugins.substitution;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import io.fares.jaxb.xjc.plugins.substitution.validators.TestValidator;
 import org.jvnet.jaxb2.maven2.AbstractXJC2Mojo;
 import org.jvnet.jaxb2.maven2.test.RunXJC2Mojo;
 
@@ -28,8 +29,13 @@ public abstract class AbstractSubstitutionPluginTest extends RunXJC2Mojo {
     assertTrue(clazzFile.isFile());
 
     try {
+
       CompilationUnit unit = JavaParser.parse(clazzFile);
-      validateGeneratedContextClass(unit);
+
+      TestValidator validator = getValidator();
+      validator.visit(unit, null);
+
+      assertTrue("Could not find the generated element for validation", validator.isFound());
 
     } catch (FileNotFoundException e) {
       assertTrue("not expecting parse failures", false);
@@ -52,6 +58,6 @@ public abstract class AbstractSubstitutionPluginTest extends RunXJC2Mojo {
     return args;
   }
 
-  protected abstract void validateGeneratedContextClass(CompilationUnit unit);
+  protected abstract TestValidator getValidator();
 
 }

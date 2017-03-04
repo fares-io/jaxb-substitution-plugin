@@ -1,7 +1,7 @@
 package io.fares.jaxb.xjc.plugins.substitution;
 
-import com.github.javaparser.ast.CompilationUnit;
-import org.junit.Ignore;
+import io.fares.jaxb.xjc.plugins.substitution.validators.ExtensionListValidator;
+import io.fares.jaxb.xjc.plugins.substitution.validators.TestValidator;
 
 import java.io.File;
 
@@ -13,8 +13,8 @@ public class SubstitutionHeadElementListTest extends AbstractSubstitutionPluginT
   }
 
   @Override
-  protected void validateGeneratedContextClass(CompilationUnit unit) {
-    new ExtensionListValidator().visit(unit, null);
+  protected TestValidator getValidator() {
+    return new ExtensionListValidator();
   }
 
 }

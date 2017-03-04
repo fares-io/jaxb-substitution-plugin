@@ -13,7 +13,7 @@
 
   <xsd:complexType name="Context">
     <xsd:sequence>
-      <xsd:element name="SubElement">
+      <xsd:element name="Extensions" minOccurs="0">
         <xsd:complexType>
           <xsd:sequence>
             <xsd:element ref="tns:Extension" minOccurs="0" maxOccurs="10">
