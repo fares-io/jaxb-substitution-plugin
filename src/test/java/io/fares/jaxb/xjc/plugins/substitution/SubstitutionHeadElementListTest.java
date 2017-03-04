@@ -5,7 +5,6 @@ import org.junit.Ignore;
 
 import java.io.File;
 
-@Ignore
 public class SubstitutionHeadElementListTest extends AbstractSubstitutionPluginTest {
 
   @Override

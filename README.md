@@ -110,8 +110,8 @@ JAXB Output:
 
 ```xml
 <t:Context xmlns:t="urn:test">
-  <t:SomeExtension />    
-  <t:OneExtension />
+  <t:SomeExtension/>    
+  <t:OneExtension/>
 </t:Context>
 ```
 

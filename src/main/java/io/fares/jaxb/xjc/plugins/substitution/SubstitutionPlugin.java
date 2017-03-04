@@ -1,6 +1,5 @@
 package io.fares.jaxb.xjc.plugins.substitution;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,9 +25,6 @@ import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.model.*;
 import com.sun.tools.xjc.model.CElementPropertyInfo.CollectionMode;
 
-import com.sun.tools.xjc.generator.bean.field.SingleField;
-import com.sun.tools.xjc.generator.bean.field.UntypedListField;
-
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 public class SubstitutionPlugin extends Plugin {
@@ -51,7 +47,7 @@ public class SubstitutionPlugin extends Plugin {
 
   @Override
   public boolean isCustomizationTagName(String nsUri, String localName) {
-    return NS.equals(nsUri) && SUBSTITUTION_HEAD_REF.equals(localName);
+    return NS.equals(nsUri) && (SUBSTITUTION_HEAD_REF.equals(localName) || SUBSTITUTION_HEAD.equals(localName));
   }
 
   @Override
@@ -76,29 +72,36 @@ public class SubstitutionPlugin extends Plugin {
 
   private void postProcessClassInfo(final Model model, final CClassInfo classInfo) {
 
-    final List<CPropertyInfo> properties = new ArrayList<>(classInfo.getProperties());
+    for (CPropertyInfo property : classInfo.getProperties()) {
 
-    for (CPropertyInfo property : properties) {
+      property.accept(new CPropertyVisitor<Void>() {
 
-      List<CPluginCustomization> elementCustomizations = Customisation.findPropertyCustomizationsInPropertyAndClass(property, SUBSTITUTION_HEAD_REF_NAME, SUBSTITUTION_HEAD_REF_NAME);
+        public Void onElement(CElementPropertyInfo property) {
+          return null;
+        }
 
-      if (!elementCustomizations.isEmpty()) {
+        public Void onAttribute(CAttributePropertyInfo property) {
+          return null;
+        }
 
-        property.accept(new CPropertyVisitor<Void>() {
+        public Void onValue(CValuePropertyInfo property) {
+          return null;
+        }
 
-          public Void onElement(CElementPropertyInfo property) {
-            return null;
+        public Void onReference(final CReferencePropertyInfo property) {
+
+          // TODO check if the property, accessor or referenced class has a substitution annotation
+
+          boolean hasPropertyCustomizations = Customisation.hasCustomizationsInProperty(property, SUBSTITUTION_HEAD_REF_NAME);
+
+          boolean hasTargetElementCustomizations = false;
+
+          // REVIEW should check if there is only 1 reference
+          for (CElement element : property.getElements()) {
+            hasTargetElementCustomizations = hasTargetElementCustomizations || Customisation.hasCustomizationsInElement(element, SUBSTITUTION_HEAD_NAME);
           }
 
-          public Void onAttribute(CAttributePropertyInfo property) {
-            return null;
-          }
-
-          public Void onValue(CValuePropertyInfo property) {
-            return null;
-          }
-
-          public Void onReference(final CReferencePropertyInfo property) {
+          if (hasPropertyCustomizations || hasTargetElementCustomizations) {
 
             int index = classInfo.getProperties().indexOf(property);
 
@@ -126,13 +129,14 @@ public class SubstitutionPlugin extends Plugin {
                 classInfo.getProperties().remove(property);
               }
             }
-
-            return null;
-
           }
 
-        });
-      }
+          return null;
+
+        }
+
+      });
+
     }
   }
 
@@ -145,7 +149,7 @@ public class SubstitutionPlugin extends Plugin {
       property.id(),
       property.getExpectedMimeType(),
       property.getSchemaComponent(),
-      property.getCustomizations(),
+      elementInfo.getCustomizations(),
       property.getLocator(),
       property.isRequired());
 
@@ -183,9 +187,9 @@ public class SubstitutionPlugin extends Plugin {
         CPropertyInfo propertyInfo = fieldOutline.getPropertyInfo();
 
         // check field property customization
-        List<CPluginCustomization> customizations = Customisation.findPropertyCustomizationsInProperty(propertyInfo, SUBSTITUTION_HEAD_REF_NAME);
-        // TODO check reference type customization as we may have a substitution:head on the global type
-        if (!customizations.isEmpty()) {
+
+        if (Customisation.hasCustomizationsInProperty(propertyInfo, SUBSTITUTION_HEAD_REF_NAME) ||
+          Customisation.hasCustomizationsInProperty(propertyInfo, SUBSTITUTION_HEAD_NAME)) {
 
           try {
             Object rawFieldVar = FieldUtils.readField(fieldOutline, "field", true);
@@ -210,10 +214,7 @@ public class SubstitutionPlugin extends Plugin {
             errorHandler.error(new SAXParseException("The substitution plugin encountered an internal error extracting the generated field details.", propertyInfo.getLocator(), e));
             return false;
           }
-
         }
-
-
       }
 
     }
