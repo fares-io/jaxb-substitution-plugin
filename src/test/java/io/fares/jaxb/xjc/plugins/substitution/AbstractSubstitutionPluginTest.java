@@ -47,6 +47,7 @@ public abstract class AbstractSubstitutionPluginTest extends RunXJC2Mojo {
   protected void configureMojo(AbstractXJC2Mojo mojo) {
     super.configureMojo(mojo);
     mojo.setForceRegenerate(true);
+    mojo.setDebug(false);
     this.mojoUnderTest = mojo;
   }
 
