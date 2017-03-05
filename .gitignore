@@ -5,6 +5,7 @@ target/
 .settings/
 .project
 .classpath
+tmp/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

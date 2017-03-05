@@ -1,1 +1,1 @@
-io.fares.jaxb.xjc.plugins.substitution.SubstitutionPlugin
+io.fares.bind.xjc.plugins.substitution.SubstitutionPlugin
