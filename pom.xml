@@ -16,6 +16,7 @@
     <log4j.version>1.2.17</log4j.version>
     <jaxb.api.version>2.2.12</jaxb.api.version>
     <jaxb.impl.version>2.2.11</jaxb.impl.version>
+    <jaxb.basics.version>0.11.1</jaxb.basics.version>
     <junit.version>4.11</junit.version>
   </properties>
 
@@ -31,6 +32,10 @@
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-xjc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.jaxb2_commons</groupId>
+      <artifactId>jaxb2-basics-tools</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -147,6 +152,11 @@
         <version>3.5</version>
       </dependency>
       <dependency>
+        <groupId>org.jvnet.jaxb2_commons</groupId>
+        <artifactId>jaxb2-basics-tools</artifactId>
+        <version>${jaxb.basics.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin-testing</artifactId>
         <version>0.13.1</version>
@@ -228,7 +238,7 @@
       <dependency>
         <groupId>org.jvnet.jaxb2_commons</groupId>
         <artifactId>jaxb2-basics</artifactId>
-        <version>0.11.1</version>
+        <version>${jaxb.basics.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -253,7 +263,7 @@
       <dependency>
         <groupId>com.github.jaxb-xew-plugin</groupId>
         <artifactId>jaxb-xew-plugin</artifactId>
-        <version>1.7</version>
+        <version>1.9</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf.xjcplugins</groupId>

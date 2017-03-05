@@ -1,23 +1,22 @@
 package io.fares.jaxb.xjc.plugins.substitution;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.namespace.QName;
 
-import com.sun.codemodel.JPackage;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
+import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JFieldVar;
 
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 
 import com.sun.tools.xjc.outline.Outline;
 import com.sun.tools.xjc.outline.ClassOutline;
@@ -26,9 +25,11 @@ import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.model.*;
 import com.sun.tools.xjc.model.CElementPropertyInfo.CollectionMode;
 
+import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
+
 import org.apache.commons.lang3.reflect.FieldUtils;
 
-public class SubstitutionPlugin extends Plugin {
+public class SubstitutionPlugin extends AbstractParameterizablePlugin {
 
   public static final String NS = "http://jaxb2-commons.dev.java.net/basic/substitution";
 
@@ -40,17 +41,6 @@ public class SubstitutionPlugin extends Plugin {
 
   public static final QName SUBSTITUTION_HEAD_REF_NAME = new QName(NS, SUBSTITUTION_HEAD_REF);
 
-
-  @Override
-  public List<String> getCustomizationURIs() {
-    return Arrays.asList(NS);
-  }
-
-  @Override
-  public boolean isCustomizationTagName(String nsUri, String localName) {
-    return NS.equals(nsUri) && (SUBSTITUTION_HEAD_REF.equals(localName) || SUBSTITUTION_HEAD.equals(localName));
-  }
-
   @Override
   public String getOptionName() {
     return "Xsubstitution";
@@ -59,6 +49,11 @@ public class SubstitutionPlugin extends Plugin {
   @Override
   public String getUsage() {
     return "  -Xsubstitution          : enable substitution group replacement";
+  }
+
+  @Override
+  public Collection<QName> getCustomizationElementNames() {
+    return Arrays.asList(SUBSTITUTION_HEAD_NAME, SUBSTITUTION_HEAD_REF_NAME);
   }
 
   @Override
