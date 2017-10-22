@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.fares.bind.xjc.plugins</groupId>
   <artifactId>jaxb-substitution-plugin</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4-SNAPSHOT</version>
   <name>JAXB Substitution XJC Plugin</name>
   <description>A XJC plugin to fix eager generation of complicated fields when substitution head elements are
     referenced. The schema author will have to specifically target either the substitution head or the substitution head
@@ -39,7 +39,7 @@
     <connection>scm:git:https://github.com/bertramn/jaxb-substitution-plugin.git</connection>
     <developerConnection>scm:git:https://github.com/bertramn/jaxb-substitution-plugin.git</developerConnection>
     <url>https://github.com/bertramn/jaxb-substitution-plugin.git</url>
-    <tag>jaxb-substitution-plugin-0.0.3</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
