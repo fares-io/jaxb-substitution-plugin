@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.fares.bind.xjc.plugins</groupId>
   <artifactId>jaxb-substitution-plugin</artifactId>
@@ -55,12 +56,15 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <slf4j.version>1.7.2</slf4j.version>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <slf4j.version>1.7.25</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
     <jaxb.api.version>2.2.12</jaxb.api.version>
     <jaxb.impl.version>2.2.11</jaxb.impl.version>
     <jaxb.basics.version>0.11.1</jaxb.basics.version>
-    <junit.version>4.11</junit.version>
+    <junit.version>4.12</junit.version>
   </properties>
 
   <dependencies>
@@ -299,6 +303,16 @@
   </dependencyManagement>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -315,23 +329,31 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.5.1</version>
+          <version>3.7.0</version>
           <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
+            <!-- compiler debug -->
             <debug>true</debug>
             <debuglevel>lines,vars,source</debuglevel>
             <optimize>true</optimize>
           </configuration>
         </plugin>
+        <!-- ensure javadocs are attached -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
-          <configuration>
-            <encoding>UTF-8</encoding>
-          </configuration>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.0.0</version>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
+        <!-- ensure sources are attached -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
@@ -345,22 +367,56 @@
             </execution>
           </executions>
         </plugin>
+        <!-- override old default jar -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.10.4</version>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.0.2</version>
           <configuration>
-            <additionalparam>-Xdoclint:none</additionalparam>
+            <archive>
+              <manifestEntries>
+                <Built-By>fasttrack</Built-By>
+              </manifestEntries>
+            </archive>
           </configuration>
+        </plugin>
+        <!-- override old clean plugin version -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
+        <!-- manage dependencies e.g. setup endorsed directory -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <!-- override old default resources -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+          <configuration>
+            <encoding>UTF-8</encoding>
+          </configuration>
+        </plugin>
+        <!-- signing is mandatory for sonatype releases -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.6</version>
           <executions>
             <execution>
-              <id>attach-javadocs</id>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
               <goals>
-                <goal>jar</goal>
+                <goal>sign</goal>
               </goals>
             </execution>
           </executions>
         </plugin>
+        <!-- ensure minimum versions -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
@@ -384,25 +440,48 @@
             </execution>
           </executions>
         </plugin>
+        <!-- surefire testing by default will exclude integration testing -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.6</version>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.21.0</version>
+          <configuration>
+            <excludes>
+              <exclude>**/*IntegrationTest.java</exclude>
+              <exclude>**/*IntegrationTests.java</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.21.0</version>
+          <configuration>
+            <includes>
+              <include>**/*IntegrationTest.java</include>
+              <include>**/*IntegrationTests.java</include>
+            </includes>
+          </configuration>
           <executions>
             <execution>
-              <id>sign-artifacts</id>
-              <phase>verify</phase>
               <goals>
-                <goal>sign</goal>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
               </goals>
             </execution>
           </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>2.5</version>
+          <artifactId>maven-surefire-report-plugin</artifactId>
+          <version>2.21.0</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.9</version>
+        </plugin>
+        <!-- activate release with java docs and code signing -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
@@ -411,7 +490,6 @@
             <autoVersionSubmodules>true</autoVersionSubmodules>
             <useReleaseProfile>false</useReleaseProfile>
             <releaseProfiles>release</releaseProfiles>
-            <goals>deploy</goals>
           </configuration>
         </plugin>
       </plugins>
@@ -419,13 +497,11 @@
   </build>
 
   <profiles>
+    <!-- release profile is automatically activated during release -->
     <profile>
       <id>release</id>
       <activation>
-        <property>
-          <name>performRelease</name>
-          <value>true</value>
-        </property>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <build>
         <plugins>
