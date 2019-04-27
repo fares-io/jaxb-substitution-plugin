@@ -61,11 +61,12 @@
     <maven.flatten.version>1.1.0</maven.flatten.version>
 
     <jaxb.version>2.3.2</jaxb.version>
+    <jackson.version>2.9.8</jackson.version>
     <jaxb.plugin.version>0.14.0</jaxb.plugin.version>
     <jaxb.basics.version>0.12.0</jaxb.basics.version>
     <slf4j.version>1.7.26</slf4j.version>
     <logback.version>1.2.3</logback.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>5.4.2</junit.version>
   </properties>
 
   <dependencies>
@@ -102,8 +103,8 @@
     <!-- endregion -->
     <!-- region testing -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -156,6 +157,20 @@
       <groupId>org.apache.cxf.xjcplugins</groupId>
       <artifactId>cxf-xjc-javadoc</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.fares.bind.xjc.plugins</groupId>
+      <artifactId>jackson-xjc-plugin</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.fares.bind.xjc.plugins</groupId>
+      <artifactId>extras-xjc-plugin</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
     </dependency>
   </dependencies>
 
@@ -253,9 +268,11 @@
       <!-- endregion -->
       <!-- region testing dependencies -->
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.github.javaparser</groupId>
@@ -318,6 +335,21 @@
         <artifactId>cxf-xjc-javadoc</artifactId>
         <version>3.3.0</version>
       </dependency>
+      <dependency>
+        <groupId>io.fares.bind.xjc.plugins</groupId>
+        <artifactId>jackson-xjc-plugin</artifactId>
+        <version>0.0.2</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fares.bind.xjc.plugins</groupId>
+        <artifactId>extras-xjc-plugin</artifactId>
+        <version>0.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>2.9.8</version>
+      </dependency>
       <!-- endregion -->
     </dependencies>
   </dependencyManagement>
@@ -335,6 +367,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>8</source>
+          <target>8</target>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>

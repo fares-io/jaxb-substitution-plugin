@@ -25,72 +25,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import java.io.IOException;
 
-class ElementRefTest implements AnnotationHelper {
+class ElementRefNestedHeadOnlyListTest implements AnnotationHelper {
 
   @RegisterExtension
   static JaxbMojoExension MOJO = JaxbMojoExension.builder()
     .verbose()
     .arg("-Xsubstitution")
+    .arg("-Xxew")
     .build();
 
+
   @Test
-  void optionalExtensionRefShouldNotHaveAnyRefs() throws ParseException, IOException {
+  void optionalExtensionListShouldHaveRef() throws ParseException, IOException {
 
     verifyOptionalField("test.OptionalContext",
-      "extension",
-      "Extension",
-      "Extension",
-      XmlElement.class,
-      MOJO::getGeneratedPath);
-
-  }
-
-  @Test
-  void optionalExtensionRefListShouldHaveRef() throws ParseException, IOException {
-
-    verifyOptionalField("test.OptionalListContext",
-      "extension",
+      "extensions",
       "Extension",
       "List<Extension>",
-      XmlElementRef.class,
-      MOJO::getGeneratedPath);
-
-  }
-
-  @Test
-  void requiredExtensionRefShouldNotHaveAnyRefs() throws ParseException, IOException {
-
-    verifyRequiredField("test.RequiredContext",
-      "extension",
-      "Extension",
-      "Extension",
-      XmlElement.class,
-      MOJO::getGeneratedPath);
-
-  }
-
-  @Test
-  void requiredExtensionRefListShouldHaveRef() throws ParseException, IOException {
-
-    verifyRequiredField("test.RequiredListContext",
-      "extension",
-      "Extension",
-      "List<Extension>",
-      XmlElementRef.class,
-      MOJO::getGeneratedPath);
-
-  }
-
-  @Test
-  void extendedExtensionRefShouldNotHaveAnyRefs() throws ParseException, IOException {
-
-    verifyRequiredField("test.ExtendedContext",
-      "extendedExtendedExtension",
-      "ExtendedExtendedExtension",
-      "ExtendedExtendedExtension",
       XmlElement.class,
       MOJO::getGeneratedPath);
 

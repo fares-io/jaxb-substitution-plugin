@@ -19,35 +19,21 @@
  */
 package io.fares.bind.xjc.plugins.substitution;
 
-import java.util.ArrayList;
+import com.sun.tools.xjc.Options;
+import com.sun.tools.xjc.model.CClassInfo;
+import com.sun.tools.xjc.model.CPropertyInfo;
+import com.sun.tools.xjc.model.Model;
+import com.sun.tools.xjc.outline.Outline;
+import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
+import org.xml.sax.ErrorHandler;
+
+import javax.xml.namespace.QName;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.namespace.QName;
-
-import org.xml.sax.SAXParseException;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
-
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JClass;
-import com.sun.codemodel.JPackage;
-import com.sun.codemodel.JFieldVar;
-
-import com.sun.tools.xjc.Options;
-
-import com.sun.tools.xjc.outline.Outline;
-import com.sun.tools.xjc.outline.ClassOutline;
-import com.sun.tools.xjc.outline.FieldOutline;
-
-import com.sun.tools.xjc.model.*;
-
-import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
-
-import org.apache.commons.lang3.reflect.FieldUtils;
+import static java.lang.String.format;
 
 public class SubstitutionPlugin extends AbstractParameterizablePlugin {
 
@@ -60,6 +46,10 @@ public class SubstitutionPlugin extends AbstractParameterizablePlugin {
   public static final String SUBSTITUTION_HEAD_REF = "head-ref";
 
   public static final QName SUBSTITUTION_HEAD_REF_NAME = new QName(NS, SUBSTITUTION_HEAD_REF);
+
+  private final Map<CClassInfo, SubstitutionCandidate> candidates = new LinkedHashMap<>();
+
+  private boolean firstModelPostProcessCall = true;
 
   @Override
   public String getOptionName() {
@@ -79,104 +69,65 @@ public class SubstitutionPlugin extends AbstractParameterizablePlugin {
   @Override
   public void postProcessModel(Model model, ErrorHandler errorHandler) {
 
+    if (firstModelPostProcessCall) {
+      firstModelPostProcessCall = false;
+      logger.info("");
+      logger.info("------------  Stage 1 - rewriting substitution type definitions ------------");
+    }
+
     for (final CClassInfo classInfo : model.beans().values()) {
-      postProcessClassInfo(model, classInfo);
+
+      if (!classInfo.hasProperties()) {
+        continue;
+      }
+
+      adjustClassProperties(classInfo);
+
     }
 
   }
 
+  private void adjustClassProperties(final CClassInfo classInfo) {
 
-  private void postProcessClassInfo(final Model model, final CClassInfo classInfo) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("");
+      logger.debug(format("inspecting %s", classInfo.fullName()));
+    }
 
-    classInfo.accept(new CClassInfoParent.Visitor<Void>() {
+    SubstitutionPropertyVisitor visitor = new SubstitutionPropertyVisitor(classInfo);
 
-      @Override
-      public Void onBean(CClassInfo bean) {
-        return null;
-      }
-
-      @Override
-      public Void onPackage(JPackage pkg) {
-        return null;
-      }
-
-      @Override
-      public Void onElement(CElementInfo element) {
-        return null;
-      }
-
-    });
-
-    // need to do this as there is another call to classInfo.getProperties() inside the visitor that
-    // otherwise causes a ConcurrentModificationException
-    List<CPropertyInfo> cpy = new ArrayList<>(50);
     for (CPropertyInfo property : classInfo.getProperties()) {
-      cpy.add(property);
+      property.accept(visitor);
     }
 
-    for (CPropertyInfo property : cpy) {
-      property.accept(new SubstitutionPropertyVisitor(classInfo));
+    SubstitutionCandidate candidate = new SubstitutionCandidate(classInfo, visitor.getProperties());
+
+    if (visitor.hasSubstitutedProperties()) {
+      candidate.modifyStage1();
+      candidates.put(classInfo, candidate);
     }
 
   }
-
 
   @Override
-  public boolean run(Outline outline, Options opt, ErrorHandler errorHandler) throws SAXException {
+  public boolean run(Outline outline, Options opt) {
 
-    for (ClassOutline classOutline : outline.getClasses()) {
-      // now in part 2 of the transformation we need to traverse the generated field declarations
-      // find our plugin customization and swap @XmlElement for @XmlElementRef
-      for (FieldOutline fieldOutline : classOutline.getDeclaredFields()) {
+    logger.info("");
+    logger.info("------------  Stage 2 - rewriting annotations ------------");
 
-        CPropertyInfo propertyInfo = fieldOutline.getPropertyInfo();
+    // now in part 2 of the transformation we need to traverse the generated field declarations
+    // find our plugin customization and swap @XmlElement for @XmlElementRef
 
-        // check field property customization
-        boolean hasHeadRef = Customisation.hasCustomizationsInProperty(propertyInfo, SUBSTITUTION_HEAD_REF_NAME);
-        // FIXME should not need to do this here but customization gets mixed up when we replace the Ref with
-        //       Element field in the model transformation.
-        hasHeadRef = Customisation.hasCustomizationsInProperty(propertyInfo, SUBSTITUTION_HEAD_NAME) || hasHeadRef;
-
-        // check if the referenced type is the subsctitution head
-        // FIXME currently only able to add the customization on the complexType and not the element
-        boolean hasHead = false;
-
-        for (CTypeInfo typeInfo : propertyInfo.ref()) {
-          hasHead = hasHead || Customisation.hasCustomizationsInType(typeInfo, SUBSTITUTION_HEAD_NAME);
-        }
-
-        if (hasHeadRef || hasHead) {
-
-          // can be changed to containsKey and getKey
-          for (JFieldVar field : classOutline.ref.fields().values()) {
-
-            if (propertyInfo.getName(false).equals(field.name())) {
-
-              JFieldVar jFieldVar = classOutline.ref.fields().get(propertyInfo.getName(false));
-
-              for (JAnnotationUse annotation : jFieldVar.annotations()) {
-                JClass acl = annotation.getAnnotationClass();
-                if (XmlElement.class.getName().equals(acl.fullName())) {
-                  try {
-                    // swap XmlElement for XmlElementRef
-                    FieldUtils.writeField(annotation, "clazz", outline.getCodeModel().ref(XmlElementRef.class), true);
-                    // TODO inspect params to make sure we don't transfer [nillable|defaultValue]
-                  } catch (IllegalAccessException e) {
-                    errorHandler.error(new SAXParseException("The substitution plugin is prevented from modifying an inaccessible field in the XJC model (generation time only). Please ensure your security manager is configured correctly.", propertyInfo.getLocator(), e));
-                    return false;
-                  } catch (IllegalArgumentException e) {
-                    errorHandler.error(new SAXParseException("The substitution plugin encountered an internal error extracting the generated field details.", propertyInfo.getLocator(), e));
-                    return false;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+    for (SubstitutionCandidate candidate : candidates.values()) {
+      candidate.modifyStage2(outline);
     }
 
+    logger.info("");
+    logger.info(format("Fixed %d class substitutions", candidates.size()));
+    logger.info("");
+
     return true;
+
   }
 
 }

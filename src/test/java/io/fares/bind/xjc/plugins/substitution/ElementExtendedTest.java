@@ -25,10 +25,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import java.io.IOException;
 
-class ElementRefTest implements AnnotationHelper {
+class ElementExtendedTest implements AnnotationHelper {
 
   @RegisterExtension
   static JaxbMojoExension MOJO = JaxbMojoExension.builder()
@@ -37,7 +36,7 @@ class ElementRefTest implements AnnotationHelper {
     .build();
 
   @Test
-  void optionalExtensionRefShouldNotHaveAnyRefs() throws ParseException, IOException {
+  void optionalExtensionElementShouldNotHaveAnyRefs() throws ParseException, IOException {
 
     verifyOptionalField("test.OptionalContext",
       "extension",
@@ -49,19 +48,19 @@ class ElementRefTest implements AnnotationHelper {
   }
 
   @Test
-  void optionalExtensionRefListShouldHaveRef() throws ParseException, IOException {
+  void optionalExtensionElementListShouldNotHaveAnyRefs() throws ParseException, IOException {
 
     verifyOptionalField("test.OptionalListContext",
       "extension",
       "Extension",
       "List<Extension>",
-      XmlElementRef.class,
+      XmlElement.class,
       MOJO::getGeneratedPath);
 
   }
 
   @Test
-  void requiredExtensionRefShouldNotHaveAnyRefs() throws ParseException, IOException {
+  void requiredExtensionElementShouldNotHaveAnyRefs() throws ParseException, IOException {
 
     verifyRequiredField("test.RequiredContext",
       "extension",
@@ -73,23 +72,23 @@ class ElementRefTest implements AnnotationHelper {
   }
 
   @Test
-  void requiredExtensionRefListShouldHaveRef() throws ParseException, IOException {
+  void requiredExtensionElementListShouldNotHaveAnyRefs() throws ParseException, IOException {
 
     verifyRequiredField("test.RequiredListContext",
       "extension",
       "Extension",
       "List<Extension>",
-      XmlElementRef.class,
+      XmlElement.class,
       MOJO::getGeneratedPath);
 
   }
 
   @Test
-  void extendedExtensionRefShouldNotHaveAnyRefs() throws ParseException, IOException {
+  void extendedExtensionElementShouldNotHaveAnyRefs() throws ParseException, IOException {
 
     verifyRequiredField("test.ExtendedContext",
-      "extendedExtendedExtension",
-      "ExtendedExtendedExtension",
+      "extension",
+      "Extension",
       "ExtendedExtendedExtension",
       XmlElement.class,
       MOJO::getGeneratedPath);
