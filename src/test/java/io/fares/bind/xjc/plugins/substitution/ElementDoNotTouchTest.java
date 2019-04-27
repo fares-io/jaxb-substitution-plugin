@@ -25,10 +25,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import java.io.IOException;
 
-class ElementRefTest implements AnnotationHelper {
+class ElementDoNotTouchTest implements AnnotationHelper {
 
   @RegisterExtension
   static JaxbMojoExension MOJO = JaxbMojoExension.builder()
@@ -37,63 +36,43 @@ class ElementRefTest implements AnnotationHelper {
     .build();
 
   @Test
-  void optionalExtensionRefShouldNotHaveAnyRefs() throws ParseException, IOException {
-
-    verifyOptionalField("test.OptionalContext",
-      "extension",
-      "Extension",
-      "Extension",
-      XmlElement.class,
-      MOJO::getGeneratedPath);
-
-  }
-
-  @Test
-  void optionalExtensionRefListShouldHaveRef() throws ParseException, IOException {
-
-    verifyOptionalField("test.OptionalListContext",
-      "extension",
-      "Extension",
-      "List<Extension>",
-      XmlElementRef.class,
-      MOJO::getGeneratedPath);
-
-  }
-
-  @Test
-  void requiredExtensionRefShouldNotHaveAnyRefs() throws ParseException, IOException {
-
+  void requiredExtensionShouldNotBeTouched() throws ParseException, IOException {
     verifyRequiredField("test.RequiredContext",
       "extension",
       "Extension",
       "Extension",
       XmlElement.class,
       MOJO::getGeneratedPath);
-
   }
 
   @Test
-  void requiredExtensionRefListShouldHaveRef() throws ParseException, IOException {
+  void requiredExtensionRefShouldNotBeTouched() throws ParseException, IOException {
+    verifyRequiredField("test.RequiredRefContext",
+      "extension",
+      "Extension",
+      "Extension",
+      XmlElement.class,
+      MOJO::getGeneratedPath);
+  }
 
+  @Test
+  void requiredExtensionListShouldNotBeTouched() throws ParseException, IOException {
     verifyRequiredField("test.RequiredListContext",
       "extension",
       "Extension",
       "List<Extension>",
-      XmlElementRef.class,
+      XmlElement.class,
       MOJO::getGeneratedPath);
-
   }
 
   @Test
-  void extendedExtensionRefShouldNotHaveAnyRefs() throws ParseException, IOException {
-
-    verifyRequiredField("test.ExtendedContext",
-      "extendedExtendedExtension",
-      "ExtendedExtendedExtension",
-      "ExtendedExtendedExtension",
+  void requiredExtensionRefListShouldNotBeTouched() throws ParseException, IOException {
+    verifyRequiredField("test.RequiredRefListContext",
+      "extension",
+      "Extension",
+      "List<Extension>",
       XmlElement.class,
       MOJO::getGeneratedPath);
-
   }
 
 }
