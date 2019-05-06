@@ -39,7 +39,7 @@ public class SubstitutionPropertyVisitor implements CPropertyVisitor<Void> {
 
   private void handleElementChoice(CElementPropertyInfo property, XSParticle particle) {
 
-    logger.warn(format(PROP_FORMAT_MSG, property.getName(false), "try to collapse multi-typed choice"));
+    logger.info(format(PROP_FORMAT_MSG, property.getName(false), "try to collapse multi-typed choice"));
     logger.info(format("    %d choice members", property.ref().size()));
 
     Map<CClassInfo, CClassInfo> baseTypes = new HashMap<>(property.ref().size());
@@ -113,10 +113,8 @@ public class SubstitutionPropertyVisitor implements CPropertyVisitor<Void> {
       MaybeElement e = (MaybeElement) elementDef;
       logger.info(format(PROP_FORMAT_MSG_TYPE, property.getName(false), toFixedString(e.getTypeName())));
     } else {
-      logger.error(format(PROP_FORMAT_MSG_TYPE, property.getName(false), elementDef.getType().fullName()));
-      assert false;
+      logger.info(format(PROP_FORMAT_MSG_TYPE, property.getName(false), elementDef.getType().fullName()));
     }
-
 
     return null;
 
@@ -131,7 +129,7 @@ public class SubstitutionPropertyVisitor implements CPropertyVisitor<Void> {
       return null;
     } else if (property.getElements().size() == 0) {
       if (property.getWildcard() != null) {
-        logger.warn(format(PROP_FORMAT_MSG, property.getName(false), "is wildcard"));
+        logger.info(format(PROP_FORMAT_MSG, property.getName(false), "is wildcard"));
       } else {
         logger.warn(format(PROP_FORMAT_MSG, property.getName(false), "is non-typed, please raise a defect for this scenario"));
       }
