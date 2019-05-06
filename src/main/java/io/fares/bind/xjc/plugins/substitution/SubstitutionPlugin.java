@@ -89,10 +89,8 @@ public class SubstitutionPlugin extends AbstractParameterizablePlugin {
 
   private void adjustClassProperties(final CClassInfo classInfo) {
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("");
-      logger.debug(format("inspecting %s", classInfo.fullName()));
-    }
+    logger.info("");
+    logger.info(format("inspecting %s", classInfo.fullName()));
 
     SubstitutionPropertyVisitor visitor = new SubstitutionPropertyVisitor(classInfo);
 
