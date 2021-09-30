@@ -44,7 +44,7 @@ public class SubstitutionPropertyReference extends SubstitutionPropertyBase<CRef
     // property has substitution members (may not be the case for abstract)
 
     final CElementPropertyInfo elementPropertyInfo = new CElementPropertyInfo(
-      property.getName(false),
+      property.getName(true),
       property.isCollection() ? REPEATED_ELEMENT : NOT_REPEATED,
       property.id(),
       property.getExpectedMimeType(),
