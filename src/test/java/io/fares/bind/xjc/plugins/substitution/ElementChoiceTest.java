@@ -24,9 +24,7 @@ import io.fares.bind.xjc.plugins.extras.testing.JaxbMojoExension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElements;
 import java.io.IOException;
 
 class ElementChoiceTest implements AnnotationHelper {

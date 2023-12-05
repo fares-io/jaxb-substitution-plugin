@@ -44,10 +44,10 @@ public class FieldCollector {
 
     return Stream.of(field)
       .filter(Objects::nonNull)
-      .map(FieldDeclaration::getType)
+      .map(FieldDeclaration::getElementType)
       .filter(t -> t instanceof ReferenceType)
       .map(ReferenceType.class::cast)
-      .map(ReferenceType::getType)
+      .map(ReferenceType::getElementType)
       .filter(t -> t instanceof ClassOrInterfaceType)
       .map(ClassOrInterfaceType.class::cast)
       .findAny();
@@ -58,7 +58,7 @@ public class FieldCollector {
 
     return annotations.stream()
       .filter(Objects::nonNull)
-      .filter(a -> a.getName().getName().equals(annotation.getSimpleName()))
+      .filter(a -> a.getName().getIdentifier().equals(annotation.getSimpleName()))
       .findAny();
 
   }

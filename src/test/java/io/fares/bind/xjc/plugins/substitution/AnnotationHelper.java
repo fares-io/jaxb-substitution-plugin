@@ -2,9 +2,13 @@ package io.fares.bind.xjc.plugins.substitution;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.printer.configuration.PrinterConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +29,7 @@ public interface AnnotationHelper {
     return ann
       .getPairs()
       .stream()
-      .filter(p -> name.equals(p.getName()))
+      .filter(p -> name.equals(p.getName().getIdentifier()))
       .map(MemberValuePair::getValue)
       .filter(e -> isInstanceOf.test(e, type))
       .map(type::cast)
@@ -41,8 +45,8 @@ public interface AnnotationHelper {
                            boolean expectedOptional,
                            Supplier<Path> generatedPathProvider) throws ParseException, IOException {
 
-    CompilationUnit unit = JavaParser.parse(generatedPathProvider.get().resolve(typeName.replace(".", File.separator) + ".java").toFile());
-
+    CompilationUnit unit = StaticJavaParser.parse(generatedPathProvider.get().resolve(typeName.replace(".", File.separator) + ".java").toFile());
+    // FIXME collector does not scrape annotations of the field
     FieldCollector collector = FieldFinder.findField(unit, fieldName);
 
     assertTrue(collector.hasField(), "field " + fieldName + " not present on compiled class");
@@ -50,7 +54,8 @@ public interface AnnotationHelper {
     // we expect the extension field to be of type test.Extension
     Optional<ClassOrInterfaceType> implType = collector.getFieldImplementationType();
     assertTrue(implType.isPresent(), "field is not a class reference but primitive");
-    assertEquals(expectedTypeName, implType.get().toStringWithoutComments());
+    assertEquals(expectedTypeName, implType.get().toString(new DefaultPrinterConfiguration()
+      .removeOption(new DefaultConfigurationOption(DefaultPrinterConfiguration.ConfigOption.PRINT_COMMENTS))));
 
     // test expected annotation
     Optional<AnnotationExpr> ann = collector.getAnnotation(expectedXmlAnnotationType);

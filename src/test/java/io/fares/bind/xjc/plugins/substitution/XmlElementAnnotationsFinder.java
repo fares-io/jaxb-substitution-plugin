@@ -17,7 +17,7 @@ public class XmlElementAnnotationsFinder extends VoidVisitorAdapter<FieldCollect
 
     super.visit(n, collector);
 
-    if (n.getName().getName().startsWith("XmlElement")) {
+    if (n.getName().getIdentifier().startsWith("XmlElement")) {
       collector.addAnnotation(n);
     }
 
@@ -28,7 +28,7 @@ public class XmlElementAnnotationsFinder extends VoidVisitorAdapter<FieldCollect
 
     super.visit(n, collector);
 
-    if (n.getName().getName().startsWith("XmlElement")) {
+    if (n.getName().getIdentifier().startsWith("XmlElement")) {
       collector.addAnnotation(n);
     }
 

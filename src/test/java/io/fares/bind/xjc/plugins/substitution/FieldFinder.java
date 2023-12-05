@@ -3,7 +3,8 @@ package io.fares.bind.xjc.plugins.substitution;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.body.VariableDeclaratorId;
+import com.github.javaparser.ast.expr.SimpleName;
+import japa.parser.ast.body.VariableDeclaratorId;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.sun.istack.NotNull;
 
@@ -21,8 +22,8 @@ public class FieldFinder extends VoidVisitorAdapter<FieldCollector> {
     super.visit(n, collector);
 
     boolean isExtensionField = n.getVariables().stream()
-      .map(VariableDeclarator::getId)
-      .map(VariableDeclaratorId::getName)
+      .map(VariableDeclarator::getName)
+      .map(SimpleName::asString)
       .anyMatch(name::equals);
 
     if (isExtensionField) {

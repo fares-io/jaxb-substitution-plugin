@@ -7,6 +7,7 @@ import com.sun.xml.xsom.XSParticle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.util.*;
 
@@ -70,7 +71,7 @@ public class SubstitutionPropertyVisitor implements CPropertyVisitor<Void> {
 
   public Void onElement(CElementPropertyInfo property) {
 
-    if (property.ref().size() == 0) {
+    if (property.ref().isEmpty()) {
       logger.info(format(PROP_FORMAT_MSG, property.getName(false), "may be wildcard"));
       return null;
     }
@@ -166,7 +167,7 @@ public class SubstitutionPropertyVisitor implements CPropertyVisitor<Void> {
     }
 
     // only rewrite if the type name is
-    if (elementDef.getType().fullName().startsWith("javax.xml.bind.JAXBElement")) {
+    if (elementDef.getType().fullName().startsWith(JAXBElement.class.getName())) {
       properties.add(new SubstitutionPropertyReference(classInfo, property, elementInfo));
     }
 
@@ -187,12 +188,16 @@ public class SubstitutionPropertyVisitor implements CPropertyVisitor<Void> {
   // region not implemented
 
   public Void onAttribute(CAttributePropertyInfo property) {
-    logger.info(format(PROP_FORMAT_MSG, property.getName(false), "not substitutable as attribute"));
+    if (logger.isDebugEnabled()) {
+      logger.debug(format(PROP_FORMAT_MSG, property.getName(false), "not substitutable as attribute"));
+    }
     return null;
   }
 
   public Void onValue(CValuePropertyInfo property) {
-    logger.info(format(PROP_FORMAT_MSG, property.getName(false), "not substitutable as value"));
+    if (logger.isDebugEnabled()) {
+      logger.debug(format(PROP_FORMAT_MSG, property.getName(false), "not substitutable as value"));
+    }
     return null;
   }
 

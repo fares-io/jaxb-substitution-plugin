@@ -48,7 +48,7 @@ public class SubstitutionCandidate {
     // list of fields to pick the customised ones from
     Map<String, JFieldVar> classFields = classOutline.ref.fields();
 
-    for (SubstitutionProperty property : properties) {
+    for (SubstitutionProperty<?, ?> property : properties) {
       JFieldVar field = classFields.get(property.getFieldName());
       if (field == null) {
         property.ignoreStage2(" field was not generated");

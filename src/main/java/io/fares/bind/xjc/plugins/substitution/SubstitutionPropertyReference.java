@@ -7,6 +7,7 @@ import com.sun.tools.xjc.outline.Outline;
 
 import static com.sun.tools.xjc.model.CElementPropertyInfo.CollectionMode.NOT_REPEATED;
 import static com.sun.tools.xjc.model.CElementPropertyInfo.CollectionMode.REPEATED_ELEMENT;
+import static java.lang.String.format;
 
 public class SubstitutionPropertyReference extends SubstitutionPropertyBase<CReferencePropertyInfo, CElementInfo> {
 
@@ -17,7 +18,7 @@ public class SubstitutionPropertyReference extends SubstitutionPropertyBase<CRef
   @Override
   public void modifyStage1() {
 
-    logger.info(String.format("  [+] %-19s: unwrap JAXBElement to %s", property.getName(false),
+    logger.info(format("  [+] %-19s: unwrap JAXBElement to %s", property.getName(false),
       typeReference.getContentType().toString()));
 
     final CElementPropertyInfo elementPropertyInfo = createProperty(property, typeReference);
@@ -32,7 +33,7 @@ public class SubstitutionPropertyReference extends SubstitutionPropertyBase<CRef
     if (property.isCollection()) {
       replaceXmlElementWithRef(outline, field);
     } else {
-      logger.info(String.format("  %-23s: not a candidate for stage 2 processing", field.name()));
+      logger.info(format("  %-23s: not a candidate for stage 2 processing", field.name()));
     }
   }
 
@@ -44,7 +45,7 @@ public class SubstitutionPropertyReference extends SubstitutionPropertyBase<CRef
     // property has substitution members (may not be the case for abstract)
 
     final CElementPropertyInfo elementPropertyInfo = new CElementPropertyInfo(
-      property.getName(false),
+      property.getName(true),
       property.isCollection() ? REPEATED_ELEMENT : NOT_REPEATED,
       property.id(),
       property.getExpectedMimeType(),
