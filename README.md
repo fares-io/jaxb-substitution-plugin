@@ -19,7 +19,7 @@ Example configuration for the JAXB2 commons compiler:
       <plugin>
         <groupId>io.fares.bind.xjc.plugins</groupId>
         <artifactId>jaxb-substitution-plugin</artifactId>
-        <version>0.0.7</version>
+        <version>0.0.8</version>
       </plugin>
     </plugins>
     <extension>true</extension>
