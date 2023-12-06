@@ -12,9 +12,10 @@ Example configuration for the JAXB2 commons compiler:
 
 ```xml
 <plugin>
-  <groupId>org.jvnet.jaxb2.maven2</groupId>
-  <artifactId>maven-jaxb2-plugin</artifactId>
+  <groupId>org.jvnet.jaxb</groupId>
+  <artifactId>jaxb-maven-plugin</artifactId>
   <configuration>
+    <extension>true</extension>
     <plugins>
       <plugin>
         <groupId>io.fares.bind.xjc.plugins</groupId>
@@ -22,7 +23,6 @@ Example configuration for the JAXB2 commons compiler:
         <version>0.0.9</version>
       </plugin>
     </plugins>
-    <extension>true</extension>
     <args>
       <arg>-Xsubstitution</arg>
     </args>
@@ -36,7 +36,7 @@ Check out the unit tests and their respective schemata for all possible usage ex
 
 Depending on whether the substitution group head is referenced in the same compilation multiple times or not, XJC compiler will create a `JAXBElement<T>` typed field. The following [article](https://community.oracle.com/blogs/kohsuke/2006/03/03/why-does-jaxb-put-xmlrootelement-sometimes-not-always) on the java.net community goes into the details of this rather strange behaviour. In a nutshell, the compiler will make decisions on how to structure binding fields based on what substitution elements are available at design time rather than solving this problem at runtime. This design neglects the fact that one can build bindings in episodes which might introduce additional substitution candidates into the overall binding context.
 
-This plugin will fix this XJC assumption and postpones the decision on what to do with additional substitution candidates to the binding runtime context. 
+This plugin will fix this XJC assumption and postpones the decision on what to do with additional substitution candidates to the binding runtime context.
 
 ### Problem 1 - Using Element Ref with a Substitution Group Head
 
@@ -106,7 +106,7 @@ JAXB Output:
 
 ```xml
 <Context xmlns="urn:test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Extension xsi:type="SomeExtension"/>    
+  <Extension xsi:type="SomeExtension"/>
   <Extension xsi:type="OneExtension"/>
 </Context>
 ```
@@ -118,7 +118,7 @@ The ideal modelling state would be to just reference a `xsd:element` which is a 
 1. ensure the `JAXBElement` wrapper is not generated
 2. ensure any `@XmlElement` annotations at field or accessor level are replaced with the `@XmlElementRef` directive
 
-Schema: 
+Schema:
 
 ```xml
 <xsd:complexType name="Context">
