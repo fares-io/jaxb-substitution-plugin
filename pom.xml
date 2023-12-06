@@ -11,7 +11,7 @@
     reference to enable this plugin.
   </description>
 
-  <url>https://github.com/bertramn/jaxb-substitution-plugin</url>
+  <url>https://github.com/fares-io/jaxb-substitution-plugin</url>
 
   <licenses>
     <license>
@@ -32,14 +32,14 @@
   </developers>
 
   <issueManagement>
-    <url>https://github.com/bertramn/jaxb-substitution-plugin/issues</url>
+    <url>https://github.com/fares-io/jaxb-substitution-plugin/issues</url>
     <system>GitHub Issues</system>
   </issueManagement>
 
   <scm>
-    <connection>scm:git:https://github.com/bertramn/jaxb-substitution-plugin.git</connection>
-    <developerConnection>scm:git:https://github.com/bertramn/jaxb-substitution-plugin.git</developerConnection>
-    <url>https://github.com/bertramn/jaxb-substitution-plugin.git</url>
+    <connection>scm:git:https://github.com/fares-io/jaxb-substitution-plugin.git</connection>
+    <developerConnection>scm:git:https://github.com/fares-io/jaxb-substitution-plugin.git</developerConnection>
+    <url>https://github.com/fares-io/jaxb-substitution-plugin.git</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -319,14 +319,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>8</source>
-          <target>8</target>
-        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>
