@@ -1,13 +1,13 @@
 package io.fares.bind.xjc.plugins.substitution;
 
 import com.sun.tools.xjc.model.*;
-import com.sun.xml.bind.v2.model.core.MaybeElement;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSParticle;
+import jakarta.xml.bind.JAXBElement;
+import org.glassfish.jaxb.core.v2.model.core.MaybeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.util.*;
 

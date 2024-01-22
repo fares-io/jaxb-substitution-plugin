@@ -1,7 +1,6 @@
 package io.fares.bind.xjc.plugins.substitution;
 
 import com.sun.tools.xjc.model.*;
-import com.sun.xml.bind.v2.model.core.MaybeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +8,7 @@ import javax.xml.namespace.QName;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.glassfish.jaxb.core.v2.model.core.MaybeElement;
 
 import static io.fares.bind.xjc.plugins.substitution.SubstitutionPlugin.SUBSTITUTION_HEAD_NAME;
 import static io.fares.bind.xjc.plugins.substitution.SubstitutionPlugin.SUBSTITUTION_HEAD_REF_NAME;

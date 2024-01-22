@@ -11,8 +11,8 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementRef;
 
 public abstract class SubstitutionPropertyBase<P extends CPropertyInfo, T extends CElement> implements SubstitutionProperty<P, T> {
 

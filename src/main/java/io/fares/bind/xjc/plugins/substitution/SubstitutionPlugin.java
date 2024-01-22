@@ -24,7 +24,7 @@ import com.sun.tools.xjc.model.CClassInfo;
 import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.model.Model;
 import com.sun.tools.xjc.outline.Outline;
-import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
+import org.jvnet.jaxb.plugin.AbstractParameterizablePlugin;
 import org.xml.sax.ErrorHandler;
 
 import javax.xml.namespace.QName;
@@ -37,7 +37,7 @@ import static java.lang.String.format;
 
 public class SubstitutionPlugin extends AbstractParameterizablePlugin {
 
-  public static final String NS = "http://jaxb2-commons.dev.java.net/basic/substitution";
+  public static final String NS = "urn:jaxb.fares.io:substitution";
 
   public static final String SUBSTITUTION_HEAD = "head";
 

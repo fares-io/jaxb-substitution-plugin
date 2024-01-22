@@ -19,7 +19,7 @@ package io.fares.bind.xjc.plugins.extras.testing;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.jvnet.jaxb.maven.XJC2Mojo;
+import org.jvnet.jaxb.maven.XJCMojo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,17 +31,17 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
-public class JaxbMojoExension implements BeforeAllCallback {
+public class JaxbMojoExtension implements BeforeAllCallback {
 
-  private static final Logger log = LoggerFactory.getLogger(JaxbMojoExension.class);
+  private static final Logger log = LoggerFactory.getLogger(JaxbMojoExtension.class);
 
   private final Path resourcePath;
 
   private final Path generatePath;
 
-  private final XJC2Mojo mojo;
+  private final XJCMojo mojo;
 
-  public JaxbMojoExension(Path resourcePath, Path generatePath, XJC2Mojo mojo) {
+  public JaxbMojoExtension(Path resourcePath, Path generatePath, XJCMojo mojo) {
     this.resourcePath = resourcePath;
     this.generatePath = generatePath;
     this.mojo = mojo;
@@ -156,22 +156,24 @@ public class JaxbMojoExension implements BeforeAllCallback {
       return this;
     }
 
-    public JaxbMojoExension build() {
+    public JaxbMojoExtension build() {
       return build(null);
     }
 
-    public JaxbMojoExension build(Consumer<XJC2Mojo> mojoConfigurer) {
+    public JaxbMojoExtension build(Consumer<XJCMojo> mojoConfigurer) {
 
-      XJC2Mojo mojo = new XJC2Mojo();
+      XJCMojo mojo = new XJCMojo();
 
       mojo.setProject(new MavenProject());
 
       // enable extension unless disabled
       mojo.setExtension(enableExtension);
 
-      // configure the arg switches
-      args.remove("-extension");
+      if (!enableExtension) {
+        args.remove("-extension");
+      }
 
+      // configure the arg switches
       mojo.setArgs(args);
 
       // set verbose and debug levels
@@ -196,7 +198,7 @@ public class JaxbMojoExension implements BeforeAllCallback {
 
       // endregion
 
-      return new JaxbMojoExension(resourcePath, generatePath, mojo);
+      return new JaxbMojoExtension(resourcePath, generatePath, mojo);
 
     }
 

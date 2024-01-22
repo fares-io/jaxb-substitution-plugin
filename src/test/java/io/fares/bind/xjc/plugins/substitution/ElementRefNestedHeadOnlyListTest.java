@@ -20,17 +20,17 @@
 package io.fares.bind.xjc.plugins.substitution;
 
 import com.github.javaparser.ParseException;
-import io.fares.bind.xjc.plugins.extras.testing.JaxbMojoExension;
+import io.fares.bind.xjc.plugins.extras.testing.JaxbMojoExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 import java.io.IOException;
 
 class ElementRefNestedHeadOnlyListTest implements AnnotationHelper {
 
   @RegisterExtension
-  static JaxbMojoExension MOJO = JaxbMojoExension.builder()
+  static JaxbMojoExtension MOJO = JaxbMojoExtension.builder()
     .verbose()
     .arg("-Xsubstitution")
     .arg("-Xxew")

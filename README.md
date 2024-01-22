@@ -8,7 +8,7 @@ Configure the XJC compiler
 
 The plugin can be used with any JAXB compiler that is capable of registering XJC plugins. The plugin jar needs to be made available to the XJC compiler classpath. In maven this is not the project classpath but the classpath of the plugin that generates code from one or more XML schema.
 
-Example configuration for the JAXB2 commons compiler:
+Example configuration for the JAXB compiler:
 
 ```xml
 <plugin>

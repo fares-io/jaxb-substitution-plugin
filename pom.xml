@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.fares.bind.xjc.plugins</groupId>
   <artifactId>jaxb-substitution-plugin</artifactId>
@@ -57,35 +57,27 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <jaxb.version>2.3.9</jaxb.version>
-    <jaxb.plugin.version>2.0.9</jaxb.plugin.version>
+    <jaxb.version>4.0.4</jaxb.version>
+    <jaxb.plugin.version>4.0.0</jaxb.plugin.version>
     <slf4j.version>1.7.36</slf4j.version>
     <logback.version>1.2.13</logback.version>
     <junit.version>5.10.1</junit.version>
+    <fv.plugin.version>1.0.2</fv.plugin.version>
+    <extras.plugin.version>1.0.2</extras.plugin.version>
+    <jackson.plugin.version>1.0.0</jackson.plugin.version>
+    <xew.plugin.version>2.1.0</xew.plugin.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.jvnet.jaxb</groupId>
-      <artifactId>jaxb2-basics-tools</artifactId>
-    </dependency>
-    <!-- region xjc -->
-    <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
-      <scope>provided</scope>
+      <artifactId>jaxb-plugins-tools</artifactId>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-xjc</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>codemodel</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <!-- endregion -->
     <!-- region logging dependencies -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -120,17 +112,12 @@
     <!-- interop testing -->
     <dependency>
       <groupId>org.jvnet.jaxb</groupId>
-      <artifactId>jaxb2-basics</artifactId>
+      <artifactId>jaxb-plugins</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jvnet.jaxb</groupId>
-      <artifactId>jaxb-basics-annotate</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.github.jaxb-xew-plugin</groupId>
-      <artifactId>jaxb-xew-plugin</artifactId>
+      <artifactId>jaxb-annox</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -149,9 +136,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <scope>test</scope>
+      <groupId>io.fares.bind.xjc.plugins</groupId>
+      <artifactId>jaxb-xew-plugin</artifactId>
+      <version>${xew.plugin.version}</version>
     </dependency>
   </dependencies>
 
@@ -171,12 +158,17 @@
       </dependency>
       <dependency>
         <groupId>org.jvnet.jaxb</groupId>
-        <artifactId>jaxb2-basics-tools</artifactId>
+        <artifactId>jaxb-basics-tools</artifactId>
         <version>${jaxb.plugin.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jvnet.jaxb</groupId>
         <artifactId>jaxb-maven-plugin</artifactId>
+        <version>${jaxb.plugin.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jvnet.jaxb</groupId>
+        <artifactId>jaxb-plugins-tools</artifactId>
         <version>${jaxb.plugin.version}</version>
       </dependency>
       <dependency>
@@ -228,7 +220,7 @@
       <dependency>
         <groupId>com.github.javaparser</groupId>
         <artifactId>javaparser-core</artifactId>
-        <version>3.25.4</version>
+        <version>3.25.5</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -239,68 +231,33 @@
       <!-- region interop testing -->
       <dependency>
         <groupId>org.jvnet.jaxb</groupId>
-        <artifactId>jaxb2-basics</artifactId>
+        <artifactId>jaxb-plugins</artifactId>
         <version>${jaxb.plugin.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jvnet.jaxb</groupId>
-        <artifactId>jaxb-basics-annotate</artifactId>
+        <artifactId>jaxb-annox</artifactId>
         <version>${jaxb.plugin.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.jaxb-xew-plugin</groupId>
-        <artifactId>jaxb-xew-plugin</artifactId>
-        <version>1.11</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-xjc</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jvnet.jaxb2_commons</groupId>
-            <artifactId>jaxb2-basics-tools</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf.xjcplugins</groupId>
         <artifactId>cxf-xjc-javadoc</artifactId>
-        <version>3.3.2</version>
+        <version>4.0.0</version>
       </dependency>
       <dependency>
         <groupId>io.fares.bind.xjc.plugins</groupId>
         <artifactId>jackson-xjc-plugin</artifactId>
-        <version>0.0.2</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.jvnet.jaxb2_commons</groupId>
-            <artifactId>jaxb2-basics-tools</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>${jackson.plugin.version}</version>
       </dependency>
       <dependency>
         <groupId>io.fares.bind.xjc.plugins</groupId>
         <artifactId>extras-xjc-plugin</artifactId>
-        <version>0.0.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.jvnet.jaxb2_commons</groupId>
-            <artifactId>jaxb2-basics-tools</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>${extras.plugin.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>2.15.2</version>
+        <groupId>io.fares.bind.xjc.plugins</groupId>
+        <artifactId>jaxb-xew-plugin</artifactId>
+        <version>${xew.plugin.version}</version>
       </dependency>
       <!-- endregion -->
     </dependencies>
@@ -339,8 +296,9 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.11.0</version>
           <configuration>
-            <source>8</source>
-            <target>8</target>
+            <source>11</source>
+            <target>11</target>
+            <release>11</release>
             <!-- compiler debug -->
             <debug>true</debug>
             <debuglevel>lines,vars,source</debuglevel>
@@ -466,7 +424,7 @@
                     <version>3.6.0</version>
                   </requireMavenVersion>
                   <requireJavaVersion>
-                    <version>1.7</version>
+                    <version>1.8</version>
                   </requireJavaVersion>
                 </rules>
               </configuration>
@@ -549,28 +507,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>jdk11-deps</id>
-      <activation>
-        <jdk>11</jdk>
-      </activation>
-      <properties>
-        <surefire.extra.args>--illegal-access=warn</surefire.extra.args>
-        <maven.compiler.release>8</maven.compiler.release>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <!-- testing under jigsaw will drive you mental, just disable this freak show until someone had a good idea on how to fix it -->
-              <useModulePath>false</useModulePath>
-            </configuration>
           </plugin>
         </plugins>
       </build>
